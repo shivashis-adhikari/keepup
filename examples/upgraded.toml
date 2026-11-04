@@ -1,0 +1,124 @@
+# the shop database a couple of years later. busier (1000 xids/s, twice the
+# event log, twice the order updates), and it went through pg_upgrade from 11
+# with its old postgresql.conf, so autovacuum_vacuum_cost_delay is still the
+# 20ms that was the default back then. pg12 dropped the default to 2ms.
+#
+#   keepup forecast examples/upgraded.toml
+#   keepup tune examples/upgraded.toml --io-budget 120MB/s --out out/upgraded
+
+version = 16
+start = "2026-11-02T00:00:00+00:00"
+timezone = "America/New_York"
+raw_credit_rate = 150000
+
+[settings]
+autovacuum_max_workers = 3
+maintenance_work_mem = "256MB"
+autovacuum_vacuum_cost_delay = "20ms"   # carried over from the pg11 config
+
+[xid_rate]
+per_second = 1000
+growth_per_day = 0.003
+hod = [0.35, 0.3, 0.28, 0.27, 0.3, 0.4, 0.6, 0.85, 1.1, 1.3, 1.4, 1.45,
+       1.45, 1.45, 1.4, 1.35, 1.3, 1.3, 1.35, 1.4, 1.3, 1.05, 0.75, 0.5]
+dow = [1.05, 1.05, 1.05, 1.05, 1.1, 0.85, 0.85]
+
+[[table]]
+name = "public.orders"
+database = "shop"
+oid = 16410
+live_tuples = 42_000_000
+dead_tuples = 900_000
+tuple_width = 140
+size_mb = 7600
+index_mb = 3900
+n_indexes = 5
+xid_age = 95_000_000
+all_visible_fraction = 0.7
+hot_fraction = 0.35
+active_fraction = 0.15     # updates are mostly on recent orders
+cache_hit = 0.6
+inserts = { per_second = 4, growth_per_day = 0.003 }
+updates = { per_second = 520, growth_per_day = 0.003, hod = [0.35, 0.3, 0.28, 0.27, 0.3, 0.4, 0.6, 0.85, 1.1, 1.3, 1.4, 1.45, 1.45, 1.45, 1.4, 1.35, 1.3, 1.3, 1.35, 1.4, 1.3, 1.05, 0.75, 0.5] }
+
+[[table]]
+name = "public.order_items"
+database = "shop"
+oid = 16422
+live_tuples = 130_000_000
+tuple_width = 64
+size_mb = 13800
+index_mb = 6100
+n_indexes = 3
+xid_age = 160_000_000
+all_visible_fraction = 0.93
+all_frozen_fraction = 0.4
+active_fraction = 0.05
+cache_hit = 0.3
+inserts = { per_second = 11, growth_per_day = 0.003 }
+updates = { per_second = 12 }
+deletes = { per_second = 2 }
+
+[[table]]
+name = "public.sessions"
+database = "shop"
+oid = 16450
+live_tuples = 1_800_000
+dead_tuples = 250_000
+tuple_width = 380
+size_mb = 1100
+index_mb = 260
+n_indexes = 2
+xid_age = 21_000_000
+hot_fraction = 0.55
+cache_hit = 0.95
+inserts = { per_second = 180 }
+updates = { per_second = 700 }
+deletes = { per_second = 180 }
+
+[[table]]
+name = "public.inventory"
+database = "shop"
+oid = 16470
+live_tuples = 450_000
+tuple_width = 90
+size_mb = 95
+index_mb = 30
+n_indexes = 2
+xid_age = 8_000_000
+hot_fraction = 0.9
+cache_hit = 0.99
+updates = { per_second = 1400 }
+
+[[table]]
+name = "public.events"
+database = "shop"
+oid = 16490
+live_tuples = 3_800_000_000
+tuple_width = 110
+size_mb = 580000
+index_mb = 82000
+n_indexes = 1
+xid_age = 182_000_000
+all_visible_fraction = 0.995
+all_frozen_fraction = 0.6
+active_fraction = 0.002
+cache_hit = 0.05
+inserts = { per_second = 260, growth_per_day = 0.004 }
+
+[[table]]
+name = "public.users"
+database = "shop"
+oid = 16390
+live_tuples = 9_500_000
+tuple_width = 310
+size_mb = 4300
+index_mb = 1500
+n_indexes = 4
+xid_age = 140_000_000
+all_visible_fraction = 0.85
+all_frozen_fraction = 0.5
+hot_fraction = 0.2
+cache_hit = 0.7
+inserts = { per_second = 0.4 }
+updates = { per_second = 25 }

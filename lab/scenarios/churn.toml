@@ -1,0 +1,59 @@
+# non-hot updates on bigger tables, and a cost limit small enough that
+# vacuums take seconds and several workers share the budget at once.
+# basic.toml leans on hot updates; this one doesn't.
+
+name = "churn"
+minutes = 40
+sample_interval = 10
+xid_rate = 150
+
+[settings]
+autovacuum_naptime = "5s"
+autovacuum_vacuum_cost_limit = 40
+autovacuum_vacuum_cost_delay = "2ms"
+log_autovacuum_min_duration = 0
+track_io_timing = "on"
+
+[restart_settings]
+autovacuum_max_workers = 3
+
+# random non-hot updates all over the table, so every vacuum reads all of it
+[[table]]
+name = "accounts"
+rows = 1000000
+width = 100
+extra_indexes = 1
+updates = 1000
+update_column = "k"
+
+# non-hot updates on the newest 10%, one per cent scale factor
+[[table]]
+name = "orders"
+rows = 2000000
+width = 150
+extra_indexes = 2
+updates = 500
+update_mode = "recent"
+recent_fraction = 0.1
+update_column = "k"
+options = { autovacuum_vacuum_scale_factor = 0.02 }
+
+[[table]]
+name = "events"
+rows = 1000000
+width = 80
+inserts = 3000
+
+[[table]]
+name = "queue"
+rows = 100000
+width = 200
+inserts = 500
+deletes = 500
+
+[[table]]
+name = "ledger"
+rows = 400000
+width = 80
+updates = 20
+options = { autovacuum_freeze_max_age = 100000, autovacuum_freeze_min_age = 10000 }

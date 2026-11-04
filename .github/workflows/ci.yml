@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e '.[dev]'
+      - run: ruff check src tests
+      - run: ruff format --check src tests
+      - run: mypy
+      - run: pytest --cov=keepup --cov-report=term-missing:skip-covered
+
+  lab-smoke:
+    # end-to-end against real servers: drive a short scenario, fit on the
+    # first half, predict the second. checks the plumbing, not accuracy.
+    runs-on: ubuntu-latest
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        pg: ["14", "16", "17"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e '.[dev]'
+      - name: start postgres ${{ matrix.pg }}
+        run: |
+          docker run -d --name pg -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust \
+            postgres:${{ matrix.pg }} \
+            -c log_autovacuum_min_duration=0 -c track_io_timing=on \
+            -c "log_line_prefix=%m [%p] "
+          for i in $(seq 1 30); do docker exec pg pg_isready -U postgres && break; sleep 1; done
+      - run: pytest tests/test_pg.py
+        env:
+          KEEPUP_TEST_DSN: host=localhost user=postgres dbname=postgres
+      - run: keepup lab run lab/scenarios/smoke.toml --out lab/runs/smoke --dsn "host=localhost user=postgres dbname=postgres"
+      - run: docker logs pg > lab/runs/smoke/postgres.log 2>&1
+      - run: keepup lab analyse lab/runs/smoke --scenario lab/scenarios/smoke.toml --log lab/runs/smoke/postgres.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab-smoke-pg${{ matrix.pg }}
+          path: lab/runs/smoke

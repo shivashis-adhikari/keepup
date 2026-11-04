@@ -1,0 +1,15 @@
+2026-10-30 11:02:19.420 CET [52011] LOG:  automatic vacuum of table "shop.public.sessions": index scans: 1
+	pages: 0 removed, 140220 remain, 98003 scanned (69.89% of total), 1200 eagerly scanned
+	tuples: 501223 removed, 1802211 remain, 77 are dead but not yet removable
+	removable cutoff: 88123001, which was 912 XIDs old when operation ended
+	frozen: 1830 pages from table (1.31% of total) had 22004 tuples frozen
+	visibility map: 97120 pages set all-visible, 1830 pages set all-frozen (12 were all-visible)
+	index scan needed: 61022 pages from table (43.52% of total) had 501223 dead item identifiers removed
+	index "sessions_pkey": pages: 9821 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+	index "sessions_user_id_idx": pages: 11200 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+	I/O timings: read: 210.112 ms, write: 0.000 ms
+	delay time: 39120.552 ms
+	avg read rate: 1.910 MB/s, avg write rate: 9.811 MB/s
+	buffer usage: 301122 hits, 12221 reads, 62777 dirtied
+	WAL usage: 201221 records, 41022 full page images, 340122011 bytes
+	system usage: CPU: user: 3.12 s, system: 0.33 s, elapsed: 49.98 s

@@ -1,0 +1,12 @@
+2024-03-11 02:14:07 UTC [88412]: [3-1] user=,db=,app=,client= LOG:  automatic vacuum of table "app.public.orders": index scans: 1
+	pages: 0 removed, 812345 remain, 0 skipped due to pins, 401100 skipped frozen
+	tuples: 1840221 removed, 42011300 remain, 1203 are dead but not yet removable, oldest xmin: 991827733
+	buffer usage: 1200333 hits, 811920 misses, 402777 dirtied
+	avg read rate: 11.402 MB/s, avg write rate: 5.656 MB/s
+	system usage: CPU: user: 31.02 s, system: 9.88 s, elapsed: 556.31 s
+2024-03-11 02:20:44 UTC [88415]: [2-1] user=,db=,app=,client= LOG:  automatic aggressive vacuum to prevent wraparound of table "app.public.events": index scans: 0
+	pages: 0 removed, 9120004 remain, 0 skipped due to pins, 0 skipped frozen
+	tuples: 0 removed, 1099120012 remain, 0 are dead but not yet removable, oldest xmin: 991830011
+	buffer usage: 9133211 hits, 9100291 misses, 9011220 dirtied
+	avg read rate: 6.102 MB/s, avg write rate: 6.043 MB/s
+	system usage: CPU: user: 402.10 s, system: 120.33 s, elapsed: 11651.02 s

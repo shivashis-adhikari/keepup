@@ -1,0 +1,45 @@
+2026-11-04 14:09:00.285 UTC [1677] LOG:  automatic vacuum of table "postgres.public.t": index scans: 1
+	pages: 0 removed, 4103 remain, 4103 scanned (100.00% of total)
+	tuples: 66666 removed, 200000 remain, 0 are dead but not yet removable
+	removable cutoff: 733, which was 0 XIDs old when operation ended
+	frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+	index scan needed: 3077 pages from table (74.99% of total) had 66666 dead item identifiers removed
+	index "t_pkey": pages: 1099 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+	index "t_v_idx": pages: 1099 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+	I/O timings: read: 0.000 ms, write: 0.054 ms
+	avg read rate: 0.000 MB/s, avg write rate: 0.099 MB/s
+	buffer usage: 13553 hits, 0 misses, 3 dirtied
+	WAL usage: 12446 records, 1 full page images, 1319597 bytes
+	system usage: CPU: user: 0.08 s, system: 0.00 s, elapsed: 0.23 s
+2026-11-04 14:09:00.416 UTC [1677] LOG:  automatic analyze of table "postgres.public.t"
+	I/O timings: read: 0.381 ms, write: 0.000 ms
+	avg read rate: 0.596 MB/s, avg write rate: 0.179 MB/s
+	buffer usage: 4299 hits, 10 misses, 3 dirtied
+	system usage: CPU: user: 0.05 s, system: 0.02 s, elapsed: 0.13 s
+2026-11-04 14:09:00.501 UTC [1677] LOG:  automatic vacuum of table "postgres.public.ins_only": index scans: 0
+	pages: 0 removed, 2804 remain, 2804 scanned (100.00% of total)
+	tuples: 0 removed, 300000 remain, 0 are dead but not yet removable
+	removable cutoff: 734, which was 0 XIDs old when operation ended
+	frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+	index scan not needed: 0 pages from table (0.00% of total) had 0 dead item identifiers removed
+	I/O timings: read: 0.000 ms, write: 0.076 ms
+	avg read rate: 0.000 MB/s, avg write rate: 0.280 MB/s
+	buffer usage: 5624 hits, 0 misses, 3 dirtied
+	WAL usage: 2805 records, 1 full page images, 173821 bytes
+	system usage: CPU: user: 0.02 s, system: 0.00 s, elapsed: 0.08 s
+2026-11-04 14:09:00.595 UTC [1677] LOG:  automatic analyze of table "postgres.public.ins_only"
+	I/O timings: read: 0.380 ms, write: 0.000 ms
+	avg read rate: 0.582 MB/s, avg write rate: 0.249 MB/s
+	buffer usage: 2910 hits, 7 misses, 3 dirtied
+	system usage: CPU: user: 0.04 s, system: 0.00 s, elapsed: 0.09 s
+2026-11-04 14:09:05.058 UTC [1678] LOG:  automatic analyze of table "template1.pg_catalog.pg_type"
+	I/O timings: read: 0.389 ms, write: 0.026 ms
+	avg read rate: 41.193 MB/s, avg write rate: 6.392 MB/s
+	buffer usage: 1023 hits, 58 misses, 9 dirtied
+	system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.01 s
+2026-11-04 14:09:05.070 UTC [1678] LOG:  automatic analyze of table "template1.pg_catalog.pg_attribute"
+	I/O timings: read: 0.228 ms, write: 0.014 ms
+	avg read rate: 26.989 MB/s, avg write rate: 4.261 MB/s
+	buffer usage: 472 hits, 38 misses, 6 dirtied
+	system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.01 s
+2026-11-04 14:09:05.071 UTC [1678] LOG:  automatic aggressive vacuum of table "template1.pg_catalog.pg_class": index scans: 0

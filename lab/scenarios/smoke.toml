@@ -1,0 +1,25 @@
+# three minutes, two tables. used by ci to check the lab plumbing end to end,
+# too short to say much about accuracy.
+
+name = "smoke"
+minutes = 3
+sample_interval = 5
+xid_rate = 50
+
+[settings]
+autovacuum_naptime = "5s"
+autovacuum_vacuum_cost_limit = 120
+log_autovacuum_min_duration = 0
+
+[[table]]
+name = "queue"
+rows = 20000
+width = 200
+inserts = 300
+deletes = 300
+
+[[table]]
+name = "append"
+rows = 100000
+width = 60
+inserts = 1000

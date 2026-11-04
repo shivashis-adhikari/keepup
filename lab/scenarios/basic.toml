@@ -1,0 +1,63 @@
+# five tables with different shapes, small enough to run on a laptop.
+# naptime is cut to 5s and the cost limit lowered so that a 40 minute run
+# sees dozens of vacuums per table and the workers have to share the cost
+# budget.
+
+name = "basic"
+minutes = 40
+sample_interval = 10
+xid_rate = 150
+
+[settings]
+autovacuum_naptime = "5s"
+autovacuum_vacuum_cost_limit = 120
+autovacuum_vacuum_cost_delay = "2ms"
+log_autovacuum_min_duration = 0
+track_io_timing = "on"
+
+[restart_settings]
+autovacuum_max_workers = 3
+
+# random updates over the whole table, most of them hot
+[[table]]
+name = "hot"
+rows = 200000
+width = 100
+fillfactor = 85
+updates = 1200
+options = { autovacuum_vacuum_scale_factor = 0.05 }
+
+# insert at one end, delete at the other
+[[table]]
+name = "queue"
+rows = 50000
+width = 200
+inserts = 300
+deletes = 300
+
+# append only, vacuumed because of autovacuum_vacuum_insert_threshold
+[[table]]
+name = "append"
+rows = 300000
+width = 60
+inserts = 1500
+extra_indexes = 1
+
+# bigger table, updates land on the newest 10% of rows
+[[table]]
+name = "orders"
+rows = 1000000
+width = 180
+extra_indexes = 2
+updates = 350
+update_mode = "recent"
+recent_fraction = 0.1
+options = { autovacuum_vacuum_scale_factor = 0.02 }
+
+# quiet table that gets anti-wraparound vacuums on a short leash
+[[table]]
+name = "ledger"
+rows = 400000
+width = 80
+updates = 20
+options = { autovacuum_freeze_max_age = 100000, autovacuum_freeze_min_age = 10000 }

@@ -1,0 +1,28 @@
+# scratch server for the validation lab. it logs to stderr, so grab the log
+# with `docker compose logs --no-log-prefix pg` once a run is done.
+#
+#   PG_VERSION=17 docker compose up -d     # any of 13..18
+services:
+  pg:
+    image: postgres:${PG_VERSION:-16}
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    command:
+      - postgres
+      - -c
+      - log_autovacuum_min_duration=0
+      - -c
+      - track_io_timing=on
+      - -c
+      - autovacuum_max_workers=3
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - "log_line_prefix=%m [%p] "
+    ports:
+      - "54320:5432"
+    shm_size: 512mb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      retries: 30

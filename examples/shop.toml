@@ -1,0 +1,142 @@
+# a made-up but not unrealistic oltp database. numbers are loosely based on
+# a mid-sized e-commerce box: ~400 xids/s, a few big tables, one append-only
+# event log that nobody thinks about until it needs an anti-wraparound vacuum.
+#
+#   keepup forecast examples/shop.toml
+
+version = 16
+start = "2026-11-02T00:00:00+00:00"
+timezone = "America/New_York"
+raw_credit_rate = 250000
+
+[settings]
+# stock settings apart from these
+autovacuum_max_workers = 3
+maintenance_work_mem = "256MB"
+
+[xid_rate]
+per_second = 400
+growth_per_day = 0.003
+hod = [0.35, 0.3, 0.28, 0.27, 0.3, 0.4, 0.6, 0.85, 1.1, 1.3, 1.4, 1.45,
+       1.45, 1.45, 1.4, 1.35, 1.3, 1.3, 1.35, 1.4, 1.3, 1.05, 0.75, 0.5]
+dow = [1.05, 1.05, 1.05, 1.05, 1.1, 0.85, 0.85]
+
+[[table]]
+name = "public.orders"
+database = "shop"
+oid = 16410
+live_tuples = 42_000_000
+dead_tuples = 900_000
+tuple_width = 140
+size_mb = 7600
+index_mb = 3900
+n_indexes = 5
+xid_age = 95_000_000
+all_visible_fraction = 0.7
+hot_fraction = 0.35
+active_fraction = 0.15     # updates are mostly on recent orders
+cache_hit = 0.6
+inserts = { per_second = 4, growth_per_day = 0.003 }
+updates = { per_second = 260, growth_per_day = 0.003, hod = [0.35, 0.3, 0.28, 0.27, 0.3, 0.4, 0.6, 0.85, 1.1, 1.3, 1.4, 1.45, 1.45, 1.45, 1.4, 1.35, 1.3, 1.3, 1.35, 1.4, 1.3, 1.05, 0.75, 0.5] }
+
+[[table]]
+name = "public.order_items"
+database = "shop"
+oid = 16422
+live_tuples = 130_000_000
+tuple_width = 64
+size_mb = 13800
+index_mb = 6100
+n_indexes = 3
+xid_age = 160_000_000
+all_visible_fraction = 0.93
+all_frozen_fraction = 0.4
+active_fraction = 0.05
+cache_hit = 0.3
+inserts = { per_second = 11, growth_per_day = 0.003 }
+updates = { per_second = 12 }
+deletes = { per_second = 2 }
+
+[[table]]
+name = "public.sessions"
+database = "shop"
+oid = 16450
+live_tuples = 1_800_000
+dead_tuples = 250_000
+tuple_width = 380
+size_mb = 1100
+index_mb = 260
+n_indexes = 2
+xid_age = 21_000_000
+hot_fraction = 0.55
+cache_hit = 0.95
+inserts = { per_second = 180 }
+updates = { per_second = 700 }
+deletes = { per_second = 180 }
+
+[[table]]
+name = "public.inventory"
+database = "shop"
+oid = 16470
+live_tuples = 450_000
+tuple_width = 90
+size_mb = 95
+index_mb = 30
+n_indexes = 2
+xid_age = 8_000_000
+hot_fraction = 0.9
+cache_hit = 0.99
+updates = { per_second = 1400 }
+
+[[table]]
+name = "public.events"
+database = "shop"
+oid = 16490
+live_tuples = 1_900_000_000
+tuple_width = 110
+size_mb = 290000
+index_mb = 41000
+n_indexes = 1
+xid_age = 182_000_000
+all_visible_fraction = 0.995
+all_frozen_fraction = 0.6
+active_fraction = 0.002
+cache_hit = 0.05
+inserts = { per_second = 260, growth_per_day = 0.004 }
+
+[[table]]
+name = "public.users"
+database = "shop"
+oid = 16390
+live_tuples = 9_500_000
+tuple_width = 310
+size_mb = 4300
+index_mb = 1500
+n_indexes = 4
+xid_age = 140_000_000
+all_visible_fraction = 0.85
+all_frozen_fraction = 0.5
+hot_fraction = 0.2
+cache_hit = 0.7
+inserts = { per_second = 0.4 }
+updates = { per_second = 25 }
+
+# fields the profiler and calibrate usually fill in, shown with what you get
+# if you leave them out:
+#
+#   tuples_per_page    computed from tuple_width and fillfactor
+#   reltuples          live_tuples
+#   update_dead_yield  1 - hot_fraction / 2   (dead rows per update after pruning)
+#   dirty_fraction     1 - cache_hit
+#   freeze_fraction    0.0
+#   options            {}   reloptions, e.g. { autovacuum_vacuum_scale_factor = 0.02 }
+#
+# and at the top level: raw_credit_rate, sleep_overhead (1.05),
+# analyze_row_seconds (5e-6).
+#
+# something holding the xmin horizon back for six hours, a day in:
+#
+#   [[pins]]
+#   start_hours = 24
+#   duration_hours = 6
+#   label = "forgotten psql session"
